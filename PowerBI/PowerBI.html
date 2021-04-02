@@ -1,0 +1,70 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width" />
+  <title>Test without Power BI JavaScript API</title>
+</head>
+<body>
+<!--
+  <div id="captionArea">
+    <h1>Power BI Embed test</h1>
+  </div>
+-->
+  <div id="embedContainer">
+    <iframe id="ifrTile" width="100%" height="100%"></iframe>
+  </div>
+  <script>
+    let _embedToken, _embedUrl, _reportId;
+    let _iframe;
+​
+    function markupValue(varName) {
+      const FWI = (window.frameElement 
+        ? window.frameElement.parentNode.FWI
+        : window.external);
+​
+      return (FWI.MarkupValue 
+        ? FWI.MarkupValue(`{&var:${varName}}`) 
+        : null);
+    }
+​
+    function updateReport() {
+      _reportId = markupValue('ReportID');
+      _embedUrl = markupValue('EmbedUrl');
+      _embedToken = markupValue('EmbedToken');
+​
+      if (_reportId && _embedUrl && _embedToken)
+        _iframe.src = _embedUrl;
+    }
+​
+    (function () {
+      _iframe = document.getElementById('ifrTile');
+      _iframe.onload = function () {
+        const msgJson = {
+          "method": "POST",
+          "url": "/report/load",
+          "headers": {
+            "x-sdk-type": "js",
+            "x-sdk-version": "2.3.2",
+            "uid": "87oes"
+          },
+          "body": {
+            "settings": {
+              "filterPaneEnabled": true,
+              "navContentPaneEnabled": true
+            },
+            "type": "report",
+            "tokenType": 1,
+            "accessToken": _embedToken,
+            "embedUrl": _embedUrl,
+            "id": _reportId,
+            "permissions": 7,
+            "uniqueId": "87oes"
+          }
+        };
+​
+        _iframe.contentWindow.postMessage(msgJson, "*");
+      };
+​
+      updateReport();
+    }());
+  </script>
+</body></html>
